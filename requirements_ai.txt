@@ -14,6 +14,7 @@ ultralytics>=8.2.18
 mediapipe>=0.10.14
 opencv-python-headless>=4.9.0.80
 numpy>=1.26.4
+supabase>=2.3.0
 
 # Audio VAD — SpeechBrain for production-grade VAD (silero-based)
 # Falls back to scipy signal-processing VAD when speechbrain unavailable.
