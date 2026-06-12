@@ -1,109 +1,62 @@
-"""
-api/schemas/
-============
+FROM python:3.10-slim AS builder
 
-Pydantic request and response schemas for the HP Proctoring API.
-"""
+WORKDIR /build
 
-from api.schemas.session import (
-StartRequest,
-StartRequestV2,
-StopRequest,
-SessionStatusResponse,
-)
+RUN apt-get update && apt-get install -y --no-install-recommends 
+build-essential 
+gcc 
+g++ 
+cmake 
+python3-dev 
+libgl1 
+libglib2.0-0 
+libsm6 
+libxext6 
+libxrender1 
+libgomp1 
+curl 
+&& rm -rf /var/lib/apt/lists/*
 
-from api.schemas.detection import (
-VideoDetectRequest,
-TabSwitchRequest,
-AudioDetectRequest,
-RiskWeightsRequest,
-RiskWeightsLoadRequest,
-AutoScreenshotRequest,
-)
+COPY requirements.txt .
+COPY requirements_ai.txt* ./
 
-from api.schemas.candidate import (
-CandidateEnrollRequest,
-CandidateResponse,
-)
+RUN pip install --upgrade pip setuptools wheel
 
-from api.schemas.admin import (
-OrganizationRequest,
-ExamRequest,
-OrganizationResponse,
-ExamResponse,
-SessionFlagRequest,
-SessionFlagResponse,
-UserCreateRequest,
-UserResponse,
-CandidateUpdateRequest,
-)
+RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
 
-from api.schemas.event import (
-BrowserEventRequest,
-FaceAbsentEventRequest,
-WindowBlurEventRequest,
-FullscreenExitEventRequest,
-EventRecordedResponse,
-EventListResponse,
-EventSummary,
-)
+RUN if [ -f requirements_ai.txt ]; then 
+pip install --prefix=/install --no-cache-dir -r requirements_ai.txt; 
+fi
 
-from api.schemas.report import (
-ReportResponse,
-ReportSummary,
-ReportListResponse,
-HPWebhookPayloadResponse,
-GenerateReportRequest,
-ReportFilterRequest,
-)
+FROM python:3.10-slim AS runtime
 
-**all** = [
-# Session
-"StartRequest",
-"StartRequestV2",
-"StopRequest",
-"SessionStatusResponse",
+WORKDIR /app
 
-```
-# Detection
-"VideoDetectRequest",
-"TabSwitchRequest",
-"AudioDetectRequest",
-"RiskWeightsRequest",
-"RiskWeightsLoadRequest",
-"AutoScreenshotRequest",
+RUN apt-get update && apt-get install -y --no-install-recommends 
+build-essential 
+gcc 
+g++ 
+cmake 
+python3-dev 
+libgl1 
+libglib2.0-0 
+libsm6 
+libxext6 
+libxrender1 
+libgomp1 
+curl 
+&& rm -rf /var/lib/apt/lists/*
 
-# Candidate
-"CandidateEnrollRequest",
-"CandidateResponse",
+COPY --from=builder /install /usr/local
 
-# Admin
-"OrganizationRequest",
-"ExamRequest",
-"OrganizationResponse",
-"ExamResponse",
-"SessionFlagRequest",
-"SessionFlagResponse",
-"UserCreateRequest",
-"UserResponse",
-"CandidateUpdateRequest",
+COPY . .
 
-# Events
-"BrowserEventRequest",
-"FaceAbsentEventRequest",
-"WindowBlurEventRequest",
-"FullscreenExitEventRequest",
-"EventRecordedResponse",
-"EventListResponse",
-"EventSummary",
+RUN mkdir -p static/screenshots static/reports logs models
 
-# Reports
-"ReportResponse",
-"ReportSummary",
-"ReportListResponse",
-"HPWebhookPayloadResponse",
-"GenerateReportRequest",
-"ReportFilterRequest",
-```
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 
-]
+USER appuser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
