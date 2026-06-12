@@ -36,5 +36,3 @@ structlog>=24.1.0
 # Utilities
 httpx>=0.27.0
 python-dotenv>=1.0.1
-
-# Face recognition — cmake installed in Dockerfile; graceful fallback to MediaPipe.
