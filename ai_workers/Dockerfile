@@ -11,17 +11,15 @@ WORKDIR /app
 # Install system dependencies
 # cmake + build tools are required for dlib (face-recognition library)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    cmake \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
-    libboost-python-dev \
-    libboost-thread-dev \
-    libx11-dev \
-    libopenblas-dev \
-    liblapack-dev \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    libgomp1 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
-
+    
 # Install Python dependencies
 COPY requirements.txt requirements_ai.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
