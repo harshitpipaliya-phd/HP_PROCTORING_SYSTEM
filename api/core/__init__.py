@@ -1,0 +1,5 @@
+"""
+api/core/
+=========
+Shared infrastructure.
+"""
