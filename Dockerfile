@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY requirements.txt .
 COPY requirements_ai.txt* ./
-RUN pip install --prefix=/install --no-cache-dir -r requirements.txt || true
+RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
 RUN if [ -f requirements_ai.txt ]; then pip install --prefix=/install --no-cache-dir -r requirements_ai.txt; fi
 
 FROM python:3.10-slim AS runtime
