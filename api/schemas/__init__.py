@@ -3,6 +3,7 @@ FROM python:3.10-slim AS builder
 WORKDIR /build
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+
 build-essential 
 gcc 
 g++ 
@@ -32,7 +33,7 @@ FROM python:3.10-slim AS runtime
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends 
+RUN apt-get update && apt-get install -y --no-install-recommends \
 build-essential 
 gcc 
 g++ 
@@ -51,9 +52,9 @@ COPY --from=builder /install /usr/local
 
 COPY . .
 
-RUN mkdir -p static/screenshots static/reports logs models
+RUN mkdir -p static/screenshots static/reports logs models \
 
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app \
 
 USER appuser
 
