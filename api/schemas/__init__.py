@@ -10,7 +10,6 @@ from api.schemas.detection import (
     RiskWeightsRequest, RiskWeightsLoadRequest, AutoScreenshotRequest,
 )
 from api.schemas.candidate import CandidateEnrollRequest, CandidateResponse
-from api.schemas.admin import AdminSessionFeed
 from api.schemas.event import (
     BrowserEventRequest, FaceAbsentEventRequest,
     WindowBlurEventRequest, FullscreenExitEventRequest,
@@ -30,7 +29,7 @@ __all__ = [
     # Candidate
     "CandidateEnrollRequest", "CandidateResponse",
     # Admin
-    "AdminSessionFeed",
+    "",
     # Events
     "BrowserEventRequest", "FaceAbsentEventRequest",
     "WindowBlurEventRequest", "FullscreenExitEventRequest",
