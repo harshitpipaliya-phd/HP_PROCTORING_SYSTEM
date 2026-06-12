@@ -100,21 +100,30 @@ def log_event(user_id: str, event: str, result: str):
 
 
 def log_session(session_id: str, user_id: str, event: str, metadata: dict = None):
-    """Log session-level events with optional metadata."""
+    """Log session-level events to proctoring_sessions table.
+    
+    FIX: Removed non-existent columns 'event' and 'timestamp'.
+         'event' string is stored in 'status' (closest semantic match).
+         'metadata' passed as raw dict (JSONB, not json-serialized string).
+         'created_at' is auto-set by DEFAULT NOW() — not passed here.
+    """
     if not _db_available:
         return
     
     _async_insert("proctoring_sessions", {
         "session_id": session_id,
         "user_id": user_id,
-        "event": event,
-        "metadata": json.dumps(metadata or {}),
-        "timestamp": _now(),
+        "status": event,          # FIX: 'event' column doesn't exist; map to 'status'
+        "metadata": metadata or {},  # FIX: pass raw dict for JSONB, not json.dumps()
     })
 
 
 def log_report(session_id: str, report: dict):
-    """Persist a complete session report."""
+    """Persist a complete session report.
+    
+    FIX: Removed non-existent 'timestamp' column (table has created_at DEFAULT NOW()).
+         report_json passed as raw dict for JSONB (not json.dumps string).
+    """
     if not _db_available:
         return
     
@@ -125,8 +134,8 @@ def log_report(session_id: str, report: dict):
         "focus_score": ra.get("focus_score", 100),
         "verdict": ra.get("ai_verdict", "Low"),
         "total_violations": report.get("violations", {}).get("total", 0),
-        "report_json": json.dumps(report),
-        "timestamp": _now(),
+        "report_json": report,  # FIX: raw dict for JSONB, not json.dumps()
+        # FIX: removed "timestamp" — does not exist; created_at uses DEFAULT NOW()
     })
 
 
