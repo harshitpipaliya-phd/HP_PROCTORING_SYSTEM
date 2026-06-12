@@ -2,7 +2,7 @@ FROM python:3.10-slim AS builder
 
 WORKDIR /build
 
-RUN apt-get update && apt-get install -y --no-install-recommends 
+RUN apt-get update && apt-get install -y --no-install-recommends \
 build-essential 
 gcc 
 g++ 
